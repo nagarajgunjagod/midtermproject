@@ -2,6 +2,7 @@ document.getElementById('search-btn').addEventListener('click', function() {
     const city = document.getElementById('city-input').value;
     if (city) {
         fetchWeatherData(city);
+        addCityToList(city);
     } else {
         alert('Please enter a city name');
     }
@@ -116,4 +117,32 @@ function displayExtendedForecast(data) {
     // Append the container to the extended forecast section
     extendedForecast.appendChild(forecastContainer);
 }
+function addCityToList(city) {
+    let recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
 
+    if (!recentCities.includes(city)) {
+        recentCities.push(city);
+        if (recentCities.length > 5) recentCities.shift(); // Keep only the last 5 cities
+        localStorage.setItem('recentCities', JSON.stringify(recentCities));
+    }
+
+    populateCityList();
+}
+
+function populateCityList() {
+    const list = document.getElementById('recent-cities');
+    list.innerHTML = ''; // Clear existing list
+
+    let recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
+
+    recentCities.forEach(city => {
+        const listItem = document.createElement('li');
+        listItem.className = 'cursor-pointer text-blue-500 hover:underline';
+        listItem.textContent = city;
+        listItem.addEventListener('click', () => fetchWeatherData(city));
+        list.appendChild(listItem);
+    });
+}
+
+// Initialize the city list on page load
+populateCityList();
